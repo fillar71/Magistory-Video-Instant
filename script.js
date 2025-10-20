@@ -1,118 +1,126 @@
-// Mengambil elemen-elemen dari HTML untuk dimanipulasi
-const videoUploader = document.getElementById('video-uploader');
-const videoPlayerOriginal = document.getElementById('video-player-original');
-const videoPlayerResult = document.getElementById('video-player-result');
-const startTimeInput = document.getElementById('start-time');
-const endTimeInput = document.getElementById('end-time');
-const trimButton = document.getElementById('trim-button');
-const logOutput = document.getElementById('log-output');
-
-// Mengambil elemen container untuk menyembunyikan/menampilkan
-const originalPreviewContainer = document.getElementById('video-preview-original-container');
-const editingControls = document.getElementById('editing-controls');
-const outputArea = document.getElementById('output-area');
-const resultPreviewContainer = document.getElementById('video-preview-result-container');
-
-let videoFile = null; // Variabel untuk menyimpan file video yang diupload
-
-// Inisialisasi FFmpeg
+// --- Inisialisasi FFmpeg (Sama seperti sebelumnya) ---
 const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({ 
-    log: true, // Mengaktifkan log untuk melihat proses di console
-    // Menambahkan fungsi untuk menampilkan log di UI
+const ffmpeg = createFFmpeg({
+    log: true,
     logger: ({ message }) => {
         log(message);
     },
 });
 
-// Fungsi untuk menampilkan pesan di area log
+// --- Mengambil Elemen HTML Baru ---
+const videoUploader = document.getElementById('video-uploader');
+const fileNameDisplay = document.getElementById('file-name-display');
+const videoPlayerOriginal = document.getElementById('video-player-original');
+const videoPlayerResult = document.getElementById('video-player-result');
+const startTimeInput = document.getElementById('start-time');
+const endTimeInput = document.getElementById('end-time');
+const trimButton = document.getElementById('trim-button');
+const downloadButton = document.getElementById('download-button');
+const logOutput = document.getElementById('log-output');
+
+// Mengambil elemen Loader dan Ikon di dalam tombol
+const loader = trimButton.querySelector('.loader');
+const trimButtonIcon = trimButton.querySelector('.button-icon');
+const trimButtonText = trimButton.querySelector('span');
+
+// Mengambil elemen Section/Card
+const editStep = document.getElementById('edit-step');
+const resultStep = document.getElementById('result-step');
+const logSection = document.getElementById('log-section');
+
+let videoFile = null;
+
+// --- Fungsi Helper ---
 function log(message) {
     logOutput.innerHTML += message + '\n';
-    logOutput.scrollTop = logOutput.scrollHeight; // Auto scroll ke bawah
+    logOutput.scrollTop = logOutput.scrollHeight;
 }
 
-// Fungsi untuk memuat FFmpeg.wasm (ini bisa memakan waktu)
+function showLoader() {
+    loader.style.display = 'block';
+    trimButtonIcon.style.display = 'none';
+    trimButtonText.textContent = 'Memproses...';
+    trimButton.disabled = true;
+}
+
+function hideLoader() {
+    loader.style.display = 'none';
+    trimButtonIcon.style.display = 'block';
+    trimButtonText.textContent = 'Potong Video Sekarang';
+    trimButton.disabled = false;
+}
+
+// --- Logika Utama ---
 async function loadFFmpeg() {
-    log('Memuat FFmpeg-core.js...');
-    await ffmpeg.load();
-    log('FFmpeg berhasil dimuat!');
-    trimButton.disabled = false; // Mengaktifkan tombol setelah FFmpeg siap
+    try {
+        await ffmpeg.load();
+        log('FFmpeg siap digunakan!');
+    } catch (error) {
+        log('Gagal memuat FFmpeg. Coba muat ulang halaman.');
+        console.error(error);
+    }
 }
 
-// Panggil fungsi untuk memuat FFmpeg saat halaman dimuat
 loadFFmpeg();
 
-// Event listener ketika pengguna memilih file video
 videoUploader.addEventListener('change', (event) => {
     videoFile = event.target.files[0];
     if (videoFile) {
         const fileURL = URL.createObjectURL(videoFile);
         videoPlayerOriginal.src = fileURL;
-        originalPreviewContainer.style.display = 'block';
-        editingControls.style.display = 'block';
-        outputArea.style.display = 'block';
-        log(`Video "${videoFile.name}" telah dipilih.`);
+        fileNameDisplay.textContent = `File: ${videoFile.name}`;
+        
+        // Tampilkan langkah berikutnya
+        editStep.style.display = 'block';
+        logSection.style.display = 'block';
+        resultStep.style.display = 'none'; // Sembunyikan hasil lama jika ada
+        log(`Video "${videoFile.name}" dipilih.`);
     }
 });
 
-// Event listener ketika tombol "Potong Video!" diklik
 trimButton.addEventListener('click', async () => {
     if (!videoFile) {
         alert('Silakan pilih file video terlebih dahulu!');
         return;
     }
     if (!ffmpeg.isLoaded()) {
-        alert('FFmpeg belum siap, mohon tunggu sebentar.');
+        alert('FFmpeg belum siap, mohon tunggu.');
         return;
     }
 
-    trimButton.disabled = true; // Nonaktifkan tombol selama proses
-    trimButton.textContent = 'Memproses...';
-    logOutput.innerHTML = ''; // Bersihkan log sebelumnya
+    showLoader();
+    logOutput.innerHTML = ''; // Bersihkan log
     log('Proses pemotongan dimulai...');
 
     const startTime = startTimeInput.value;
     const endTime = endTimeInput.value;
 
     if (parseFloat(startTime) >= parseFloat(endTime)) {
-        alert('Waktu mulai harus lebih kecil dari waktu akhir!');
-        trimButton.disabled = false;
-        trimButton.textContent = 'Potong Video!';
+        alert('Waktu mulai harus lebih kecil dari waktu selesai!');
+        hideLoader();
         return;
     }
 
     try {
-        // 1. Tulis file video ke memori virtual FFmpeg
-        log('Menulis file ke memori virtual FFmpeg...');
         ffmpeg.FS('writeFile', videoFile.name, await fetchFile(videoFile));
 
-        // 2. Jalankan perintah FFmpeg untuk memotong video
         log(`Menjalankan perintah: -i "${videoFile.name}" -ss ${startTime} -to ${endTime} -c copy output.mp4`);
-        await ffmpeg.run(
-            '-i', videoFile.name,
-            '-ss', startTime, // Waktu mulai
-            '-to', endTime,   // Waktu akhir
-            '-c', 'copy',     // Menyalin codec (sangat cepat, tanpa re-encoding)
-            'output.mp4'
-        );
+        await ffmpeg.run('-i', videoFile.name, '-ss', startTime, '-to', endTime, '-c', 'copy', 'output.mp4');
 
-        // 3. Baca file hasil (output.mp4) dari memori virtual FFmpeg
-        log('Membaca hasil video...');
         const data = ffmpeg.FS('readFile', 'output.mp4');
-
-        // 4. Buat URL dari data biner hasil video dan tampilkan
         const resultURL = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+        
         videoPlayerResult.src = resultURL;
-        resultPreviewContainer.style.display = 'block';
-        log('Proses pemotongan berhasil! Video hasil ada di bawah.');
+        downloadButton.href = resultURL;
+
+        resultStep.style.display = 'block'; // Tampilkan kartu hasil
+        log('Proses pemotongan berhasil! 🎉');
 
     } catch (error) {
-        log('Terjadi kesalahan saat pemrosesan:');
+        log('Terjadi kesalahan saat memproses:');
         log(error);
         alert('Gagal memproses video. Cek log untuk detail.');
     } finally {
-        // Aktifkan kembali tombol setelah proses selesai (baik berhasil maupun gagal)
-        trimButton.disabled = false;
-        trimButton.textContent = 'Potong Video!';
+        hideLoader();
     }
 });
