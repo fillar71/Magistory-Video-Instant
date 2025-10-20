@@ -1,12 +1,3 @@
-// --- Inisialisasi FFmpeg ---
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({
-    log: true,
-    logger: ({ message }) => {
-        log(message);
-    },
-});
-
 // --- Mengambil Elemen HTML ---
 const videoUploader = document.getElementById('video-uploader');
 const fileNameDisplay = document.getElementById('file-name-display');
@@ -25,6 +16,11 @@ const trimButtonText = trimButton.querySelector('span');
 const editStep = document.getElementById('edit-step');
 const resultStep = document.getElementById('result-step');
 const logSection = document.getElementById('log-section');
+
+// Mengambil Elemen Baru untuk Progress Bar
+const loaderContainer = document.getElementById('loader-container');
+const loaderStatus = document.getElementById('loader-status');
+const progressBarInner = document.getElementById('progress-bar-inner');
 
 let videoFile = null;
 
@@ -48,23 +44,32 @@ function hideLoader() {
     trimButton.disabled = false;
 }
 
+// --- Inisialisasi FFmpeg dengan Progress Handler ---
+const { createFFmpeg, fetchFile } = FFmpeg;
+const ffmpeg = createFFmpeg({
+    log: true,
+    logger: ({ message }) => { log(message); },
+    progress: (p) => {
+        const progress = (p.ratio * 100).toFixed(0);
+        progressBarInner.style.width = `${progress}%`;
+        loaderStatus.textContent = `Mengunduh mesin... ${progress}%`;
+    },
+});
+
 // --- Logika Utama ---
 async function loadFFmpeg() {
-    // Nonaktifkan tombol saat FFmpeg sedang dimuat
-    trimButton.disabled = true;
-    trimButtonText.textContent = 'Memuat Mesin Editor...';
-
     try {
-        log('Mulai memuat FFmpeg (bisa butuh waktu)...');
+        log('Mulai memuat FFmpeg...');
         await ffmpeg.load();
         log('✅ FFmpeg siap digunakan!');
-        // Aktifkan kembali tombol jika berhasil
-        trimButton.disabled = false;
-        trimButtonText.textContent = 'Potong Video Sekarang';
+        // Sembunyikan loader jika berhasil
+        loaderContainer.style.display = 'none';
 
     } catch (error) {
         log('❌ Gagal memuat FFmpeg. Coba muat ulang halaman dengan koneksi internet yang lebih baik.');
-        trimButtonText.textContent = 'Gagal Memuat Mesin';
+        loaderStatus.textContent = 'Gagal memuat mesin editor. Mohon muat ulang halaman.';
+        // Beri warna merah jika gagal
+        progressBarInner.style.backgroundColor = '#e74c3c';
         console.error(error);
     }
 }
@@ -95,7 +100,6 @@ trimButton.addEventListener('click', async () => {
         alert('Silakan pilih file video terlebih dahulu!');
         return;
     }
-    // Pemeriksaan ini sekarang menjadi cadangan, karena tombol seharusnya sudah nonaktif jika gagal
     if (!ffmpeg.isLoaded()) {
         alert('FFmpeg belum siap. Coba muat ulang halaman.');
         return;
@@ -125,7 +129,7 @@ trimButton.addEventListener('click', async () => {
         resultStep.style.display = 'block';
         log('Proses pemotongan berhasil! 🎉');
 
-    } catch (error) {
+    } catch (error) Caching Cerdas dengan Service Worker (Solusi Terbaik)
         log('Terjadi kesalahan saat memproses:');
         log(error);
         alert('Gagal memproses video. Cek log untuk detail.');
