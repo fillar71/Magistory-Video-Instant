@@ -202,3 +202,29 @@ input[type="number"] {
     overflow-y: auto;
     border: 1px solid var(--border-color);
 }
+
+/* Gaya Baru untuk Progress Bar */
+.loader-container {
+    background-color: var(--surface-color);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    background-color: var(--bg-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-bar-inner {
+    width: 0%;
+    height: 15px;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    }
