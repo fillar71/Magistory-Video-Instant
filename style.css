@@ -1,11 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+/* Definisi Variabel Warna untuk Tema Gelap */
+:root {
+    --bg-color: #121212;
+    --surface-color: #1e1e1e;
+    --primary-color: #6a5acd;
+    --primary-hover: #5a4bbf;
+    --text-color: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --border-color: #333333;
+    --success-color: #2ecc71;
+}
 
 body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     margin: 0;
-    padding: 20px;
+    padding: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,56 +24,86 @@ body {
 
 .container {
     width: 100%;
-    max-width: 800px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    box-sizing: border-box;
+    max-width: 600px;
 }
 
 header {
     text-align: center;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 32px;
 }
 
 header h1 {
+    font-size: 2.5rem;
     margin: 0;
-    color: #1a73e8;
+    color: #fff;
 }
 
 header p {
-    margin: 5px 0 0;
-    color: #5f6368;
+    font-size: 1rem;
+    margin: 4px 0 0;
+    color: var(--text-secondary);
 }
 
-.card {
-    background-color: #fafafa;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
+.step-card, .log-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
     margin-bottom: 20px;
 }
 
-h2, h3 {
-    margin-top: 0;
-    color: #1a73e8;
+.step-number {
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: 700;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-input[type="file"], input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    margin-top: 5px;
+.step-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-color);
 }
 
-.video-preview-container {
+.upload-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
     width: 100%;
-    margin-top: 15px;
+    padding: 16px;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+    font-weight: 500;
+}
+
+.upload-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary-color);
+}
+
+.file-name {
+    text-align: center;
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-style: italic;
+    word-break: break-all;
 }
 
 video {
@@ -74,49 +114,91 @@ video {
 
 .trim-controls {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 16px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.trim-controls label {
-    font-weight: 600;
+.input-group {
+    flex: 1;
 }
 
-button {
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+input[type="number"] {
     width: 100%;
     padding: 12px;
-    font-size: 16px;
-    font-weight: 600;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.action-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
     color: #fff;
-    background-color: #1a73e8;
+    background-color: var(--primary-color);
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    text-decoration: none;
     transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #155ab6;
+.action-button:hover {
+    background-color: var(--primary-hover);
 }
 
-button:disabled {
-    background-color: #a0c3ff;
-    cursor: not-allowed;
+.action-button.download {
+    background-color: var(--success-color);
+}
+.action-button.download:hover {
+    background-color: #27ae60;
 }
 
-#log-container {
-    margin-top: 20px;
+/* Loader / Spinner Animation */
+.loader {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.log-card h3 {
+    margin-top: 0;
+    color: var(--text-secondary);
 }
 
 #log-output {
-    background-color: #2d2d2d;
+    background-color: #000;
     color: #00ff41;
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 8px;
     white-space: pre-wrap;
     word-wrap: break-word;
-    font-family: monospace;
-    max-height: 200px;
+    font-family: 'Courier New', Courier, monospace;
+    max-height: 250px;
     overflow-y: auto;
+    border: 1px solid var(--border-color);
 }
