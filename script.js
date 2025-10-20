@@ -1,4 +1,15 @@
-// --- Mengambil Elemen HTML ---
+// Tambahkan ini di paling atas script.js
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/Magistory-Instant-Video/sw.js') // PENTING: Sesuaikan nama repo
+      .then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      })
+      .catch(err => {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  });
+}// --- Mengambil Elemen HTML ---
 const videoUploader = document.getElementById('video-uploader');
 const fileNameDisplay = document.getElementById('file-name-display');
 const videoPlayerOriginal = document.getElementById('video-player-original');
