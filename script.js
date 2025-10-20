@@ -1,23 +1,16 @@
-// Tambahkan ini di paling atas script.js
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Magistory-Instant-Video/sw.js') // PENTING: Sesuaikan nama repo
-      .then(registration => {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      })
-      .catch(err => {
-        console.log('ServiceWorker registration failed: ', err);
-      });
-  });
-}// --- Mengambil Elemen HTML ---
+// --- GANTI URL INI DENGAN URL BACKEND ANDA (DARI RENDER ATAU RAILWAY) ---
+const BACKEND_URL = 'magistory-backend-production.up.railway.app/process-video'; 
+// Contoh: 'https://magistory-backend.onrender.com/process-video'
+// Contoh: 'https://magistory-backend-production-xxxx.up.railway.app/process-video'
+
+
+// --- Mengambil Elemen HTML ---
 const videoUploader = document.getElementById('video-uploader');
 const fileNameDisplay = document.getElementById('file-name-display');
 const videoPlayerOriginal = document.getElementById('video-player-original');
-const videoPlayerResult = document.getElementById('video-player-result');
 const startTimeInput = document.getElementById('start-time');
 const endTimeInput = document.getElementById('end-time');
 const trimButton = document.getElementById('trim-button');
-const downloadButton = document.getElementById('download-button');
 const logOutput = document.getElementById('log-output');
 
 const loader = trimButton.querySelector('.loader');
@@ -27,11 +20,7 @@ const trimButtonText = trimButton.querySelector('span');
 const editStep = document.getElementById('edit-step');
 const resultStep = document.getElementById('result-step');
 const logSection = document.getElementById('log-section');
-
-// Mengambil Elemen Baru untuk Progress Bar
-const loaderContainer = document.getElementById('loader-container');
-const loaderStatus = document.getElementById('loader-status');
-const progressBarInner = document.getElementById('progress-bar-inner');
+const downloadButton = document.getElementById('download-button'); // Meski tidak dipakai untuk menampilkan, elemennya masih ada
 
 let videoFile = null;
 
@@ -41,10 +30,10 @@ function log(message) {
     logOutput.scrollTop = logOutput.scrollHeight;
 }
 
-function showLoader() {
+function showLoader(message = 'Memproses...') {
     loader.style.display = 'block';
     trimButtonIcon.style.display = 'none';
-    trimButtonText.textContent = 'Memproses...';
+    trimButtonText.textContent = message;
     trimButton.disabled = true;
 }
 
@@ -55,50 +44,13 @@ function hideLoader() {
     trimButton.disabled = false;
 }
 
-// --- Inisialisasi FFmpeg dengan Progress Handler ---
-const { createFFmpeg, fetchFile } = FFmpeg;
-const ffmpeg = createFFmpeg({
-    log: true,
-    logger: ({ message }) => { log(message); },
-    progress: (p) => {
-        const progress = (p.ratio * 100).toFixed(0);
-        progressBarInner.style.width = `${progress}%`;
-        loaderStatus.textContent = `Mengunduh mesin... ${progress}%`;
-    },
-});
-
 // --- Logika Utama ---
-async function loadFFmpeg() {
-    try {
-        log('Mulai memuat FFmpeg...');
-        await ffmpeg.load();
-        log('✅ FFmpeg siap digunakan!');
-        // Sembunyikan loader jika berhasil
-        loaderContainer.style.display = 'none';
-
-    } catch (error) {
-        log('❌ Gagal memuat FFmpeg. Coba muat ulang halaman dengan koneksi internet yang lebih baik.');
-        loaderStatus.textContent = 'Gagal memuat mesin editor. Mohon muat ulang halaman.';
-        // Beri warna merah jika gagal
-        progressBarInner.style.backgroundColor = '#e74c3c';
-        console.error(error);
-    }
-}
-
-// Panggil fungsi load saat halaman pertama kali dibuka
-loadFFmpeg();
-
 videoUploader.addEventListener('change', (event) => {
     videoFile = event.target.files[0];
     if (videoFile) {
-        videoPlayerOriginal.onerror = () => {
-            alert(`Error: Browser tidak dapat memutar video ini. Kemungkinan format atau codec tidak didukung.`);
-            console.error("Video player error:", videoPlayerOriginal.error);
-        };
         const fileURL = URL.createObjectURL(videoFile);
         videoPlayerOriginal.src = fileURL;
         fileNameDisplay.textContent = `File: ${videoFile.name}`;
-
         editStep.style.display = 'block';
         logSection.style.display = 'block';
         resultStep.style.display = 'none';
@@ -111,39 +63,54 @@ trimButton.addEventListener('click', async () => {
         alert('Silakan pilih file video terlebih dahulu!');
         return;
     }
-    if (!ffmpeg.isLoaded()) {
-        alert('FFmpeg belum siap. Coba muat ulang halaman.');
-        return;
-    }
 
-    showLoader();
+    showLoader('Mengunggah & Memproses...');
     logOutput.innerHTML = '';
-    log('Proses pemotongan dimulai...');
+    log('Mempersiapkan data untuk dikirim ke server...');
 
     const startTime = startTimeInput.value;
     const endTime = endTimeInput.value;
 
-    if (parseFloat(startTime) >= parseFloat(endTime)) {
-        alert('Waktu mulai harus lebih kecil dari waktu selesai!');
-        hideLoader();
-        return;
-    }
+    const formData = new FormData();
+    formData.append('video', videoFile);
+    formData.append('startTime', startTime);
+    formData.append('endTime', endTime);
 
+    log('Mengirim video ke server... Ini mungkin butuh waktu tergantung koneksi Anda.');
+    
     try {
-        ffmpeg.FS('writeFile', videoFile.name, await fetchFile(videoFile));
-        await ffmpeg.run('-i', videoFile.name, '-ss', startTime, '-to', endTime, '-c', 'copy', 'output.mp4');
-        const data = ffmpeg.FS('readFile', 'output.mp4');
-        const resultURL = URL.createObjectURL(new Blob([data.buffer], { type: 'video/mp4' }));
+        const response = await fetch(BACKEND_URL, {
+            method: 'POST',
+            body: formData,
+        });
 
-        videoPlayerResult.src = resultURL;
-        downloadButton.href = resultURL;
-        resultStep.style.display = 'block';
-        log('Proses pemotongan berhasil! 🎉');
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server merespon dengan error: ${errorText}`);
+        }
 
-    } catch (error) Caching Cerdas dengan Service Worker (Solusi Terbaik)
-        log('Terjadi kesalahan saat memproses:');
-        log(error);
-        alert('Gagal memproses video. Cek log untuk detail.');
+        log('Server selesai memproses. Mengunduh hasil...');
+        const videoBlob = await response.blob();
+        
+        // Membuat link sementara untuk memicu download
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(videoBlob);
+        a.download = `magistory-trimmed-${videoFile.name}`;
+        document.body.appendChild(a);
+
+        log('Download akan dimulai...');
+        a.click();
+        
+        // Membersihkan link sementara setelah di-klik
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        
+        log('Proses selesai! 🎉 Cek file hasil download Anda.');
+
+    } catch (error) {
+        log('Terjadi kesalahan: ' + error.message);
+        console.error(error);
+        alert('Gagal berkomunikasi dengan server. Cek log untuk detail.');
     } finally {
         hideLoader();
     }
