@@ -1,4 +1,3 @@
-/* Definisi Variabel Warna untuk Tema Gelap */
 :root {
     --bg-color: #121212;
     --surface-color: #1e1e1e;
@@ -163,14 +162,6 @@ input[type="number"] {
     background-color: var(--primary-hover);
 }
 
-.action-button.download {
-    background-color: var(--success-color);
-}
-.action-button.download:hover {
-    background-color: #27ae60;
-}
-
-/* Loader / Spinner Animation */
 .loader {
     width: 20px;
     height: 20px;
@@ -202,29 +193,3 @@ input[type="number"] {
     overflow-y: auto;
     border: 1px solid var(--border-color);
 }
-
-/* Gaya Baru untuk Progress Bar */
-.loader-container {
-    background-color: var(--surface-color);
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 24px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.progress-bar {
-    width: 100%;
-    background-color: var(--bg-color);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-.progress-bar-inner {
-    width: 0%;
-    height: 15px;
-    background-color: var(--primary-color);
-    border-radius: 10px;
-    transition: width 0.3s ease;
-    }
