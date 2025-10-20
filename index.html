@@ -1,166 +1,57 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Magistory Instant Video - Web Editor</title>
-    <!-- Memuat Tailwind CSS untuk styling cepat -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Style tambahan untuk tampilan yang lebih baik */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .app-container {
-            max-width: 900px;
-        }
-        .video-container, .canvas-container {
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border-radius: 0.75rem;
-            overflow: hidden;
-        }
-        .control-button {
-            transition: all 0.2s ease-in-out;
-        }
-        .control-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .control-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Magistory Instant Video</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <div class="app-container w-full mx-auto bg-gray-800 rounded-xl shadow-2xl p-6 space-y-6">
-        <!-- HEADER -->
-        <header class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-cyan-400">Magistory Web Editor</h1>
-            <p class="text-gray-400 mt-2">Pilih video, terapkan efek, dan simpan hasilnya. Semua di browser Anda.</p>
+    <div class="container">
+        <header>
+            <h1>🎬 Magistory Instant Video</h1>
+            <p>Editor video sederhana, cepat, dan berjalan di browser Anda.</p>
         </header>
 
-        <!-- KONTROL UTAMA -->
-        <div class="controls bg-gray-700 p-4 rounded-lg flex flex-col md:flex-row items-center justify-center gap-4">
-            <input type="file" id="video-upload" accept="video/*" class="hidden">
-            <label for="video-upload" class="control-button bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg cursor-pointer w-full md:w-auto text-center">
-                Pilih Video
-            </label>
-            <button id="grayscale-btn" disabled class="control-button bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg w-full md:w-auto">
-                Terapkan Filter Hitam-Putih
-            </button>
-            <a id="download-btn" class="control-button bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg w-full md:w-auto text-center hidden" download="edited-frame.png">
-                Simpan Frame
-            </a>
-        </div>
+        <main>
+            <div class="card">
+                <h2>1. Pilih Video Anda</h2>
+                <input type="file" id="video-uploader" accept="video/*">
+            </div>
 
-        <!-- AREA VIDEO DAN CANVAS -->
-        <div id="editor-area" class="grid grid-cols-1 md:grid-cols-2 gap-6 hidden">
-            <!-- Video Asli -->
-            <div>
-                <h2 class="text-xl font-semibold mb-2 text-center">Video Asli</h2>
-                <div class="video-container bg-black">
-                    <video id="source-video" class="w-full" controls></video>
+            <div class="card video-preview-container" id="video-preview-original-container" style="display: none;">
+                <h3>Video Asli</h3>
+                <video id="video-player-original" controls></video>
+            </div>
+
+            <div class="card" id="editing-controls" style="display: none;">
+                <h2>2. Atur Pemotongan (Trim)</h2>
+                <div class="trim-controls">
+                    <label for="start-time">Waktu Mulai (detik):</label>
+                    <input type="number" id="start-time" value="0" min="0">
+                    <label for="end-time">Waktu Akhir (detik):</label>
+                    <input type="number" id="end-time" value="5" min="0">
+                </div>
+                <button id="trim-button">Potong Video!</button>
+            </div>
+
+            <div class="card" id="output-area" style="display: none;">
+                <h2>3. Hasil</h2>
+                <div class="video-preview-container" id="video-preview-result-container" style="display: none;">
+                     <h3>Video Hasil Potong</h3>
+                    <video id="video-player-result" controls></video>
+                </div>
+                <div id="log-container">
+                    <h3>Log Proses:</h3>
+                    <pre id="log-output">Menunggu aksi...</pre>
                 </div>
             </div>
-            <!-- Hasil Edit (Canvas) -->
-            <div>
-                <h2 class="text-xl font-semibold mb-2 text-center">Hasil Edit</h2>
-                <div class="canvas-container bg-black">
-                    <canvas id="output-canvas" class="w-full"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Pesan Status -->
-        <div id="status-message" class="text-center text-gray-500">
-            <p>Silakan pilih file video untuk memulai.</p>
-        </div>
-
+        </main>
     </div>
 
-    <script>
-        // --- Mengambil elemen dari HTML ---
-        const videoUpload = document.getElementById('video-upload');
-        const sourceVideo = document.getElementById('source-video');
-        const outputCanvas = document.getElementById('output-canvas');
-        const grayscaleBtn = document.getElementById('grayscale-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const editorArea = document.getElementById('editor-area');
-        const statusMessage = document.getElementById('status-message');
-        
-        // Mendapatkan konteks 2D dari canvas, ini adalah 'kuas' kita
-        const ctx = outputCanvas.getContext('2d');
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.0/dist/ffmpeg.min.js"></script>
+    <script src="script.js"></script>
 
-        let videoLoaded = false;
-
-        // --- Event Listener untuk Input File ---
-        videoUpload.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                // Membuat URL lokal untuk file video yang dipilih
-                const videoURL = URL.createObjectURL(file);
-                sourceVideo.src = videoURL;
-                
-                // Menampilkan area editor dan menyembunyikan pesan status
-                editorArea.classList.remove('hidden');
-                statusMessage.classList.add('hidden');
-                
-                // Mengaktifkan tombol efek
-                grayscaleBtn.disabled = false;
-                videoLoaded = true;
-            }
-        });
-        
-        // --- Event Listener untuk memastikan ukuran canvas sesuai video ---
-        sourceVideo.addEventListener('loadedmetadata', () => {
-            outputCanvas.width = sourceVideo.videoWidth;
-            outputCanvas.height = sourceVideo.videoHeight;
-        });
-
-        // --- Fungsi untuk Menerapkan Filter Hitam-Putih ---
-        function applyGrayscaleFilter() {
-            if (!videoLoaded) return;
-
-            // 1. Gambar frame video yang sedang diputar ke canvas
-            ctx.drawImage(sourceVideo, 0, 0, outputCanvas.width, outputCanvas.height);
-
-            // 2. Ambil semua data piksel dari canvas
-            const imageData = ctx.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
-            const data = imageData.data; // Array [R, G, B, A, R, G, B, A, ...]
-
-            // 3. Loop melalui setiap piksel (4 elemen array per piksel)
-            for (let i = 0; i < data.length; i += 4) {
-                // Hitung nilai rata-rata dari R, G, B untuk mendapatkan warna abu-abu
-                const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                data[i]     = avg; // Red
-                data[i + 1] = avg; // Green
-                data[i + 2] = avg; // Blue
-            }
-
-            // 4. Timpa canvas dengan data piksel yang sudah dimodifikasi
-            ctx.putImageData(imageData, 0, 0);
-
-            // 5. Tampilkan tombol download
-            prepareDownloadLink();
-        }
-
-        // --- Fungsi untuk Menyiapkan Link Download ---
-        function prepareDownloadLink() {
-             // Mengubah isi canvas menjadi URL gambar format PNG
-            const dataUrl = outputCanvas.toDataURL('image/png');
-            downloadBtn.href = dataUrl;
-            downloadBtn.classList.remove('hidden');
-        }
-
-        // --- Event Listener untuk Tombol Filter ---
-        grayscaleBtn.addEventListener('click', applyGrayscaleFilter);
-
-    </script>
 </body>
 </html>
-
