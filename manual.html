@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Editing - Magistory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✂️ Manual Editing</h1>
+            <p>Unggah atau cari video untuk diedit</p>
+        </header>
+
+        <a href="index.html" class="back-button">&larr; Kembali ke Menu</a>
+
+        <main id="manual-editing-section">
+            <section class="step-card" id="upload-step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2>Pilih Sumber Video</h2>
+                </div>
+                
+                <label for="video-uploader" class="upload-button">
+                    <span>Pilih Dari Galeri</span>
+                </label>
+                <input type="file" id="video-uploader" accept="video/*" hidden>
+                
+                <p class="separator-text">atau</p>
+                
+                <div class="pexels-search-container">
+                    <input type="text" id="pexels-search-input" placeholder="Cari video di Pexels...">
+                    <button id="btn-search-pexels">Cari</button>
+                </div>
+                <div id="pexels-results" class="video-results-grid"></div>
+            </section>
+
+            <section class="step-card" id="edit-step" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2>Pratinjau & Atur Pemotongan</h2>
+                </div>
+                <p id="file-name-display" class="file-name"></p>
+                <div class="video-container">
+                    <video id="video-player-original" controls></video>
+                </div>
+                <div class="trim-controls">
+                    <div class="input-group">
+                        <label for="start-time">Mulai (detik)</label>
+                        <input type="number" id="start-time" value="0" min="0">
+                    </div>
+                    <div class="input-group">
+                        <label for="end-time">Selesai (detik)</label>
+                        <input type="number" id="end-time" value="5" min="0">
+                    </div>
+                </div>
+                <button id="trim-button" class="action-button">
+                    <div class="loader" style="display: none;"></div>
+                    <span>Potong Video Sekarang</span>
+                </button>
+            </section>
+            
+            <section class="log-card" id="log-section" style="display: none;">
+                <h3>Log Proses</h3>
+                <pre id="log-output"></pre>
+            </section>
+        </main>
+    </div>
+    <script src="manual.js"></script>
+</body>
+      </html>
