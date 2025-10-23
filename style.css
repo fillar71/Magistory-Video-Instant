@@ -17,7 +17,7 @@ body {
     padding: 16px;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
 }
 
@@ -43,6 +43,55 @@ header p {
     color: var(--text-secondary);
 }
 
+/* --- Gaya Menu Utama --- */
+#main-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.menu-card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.menu-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-5px);
+}
+
+.menu-card h2 {
+    margin: 0 0 8px 0;
+    color: var(--primary-color);
+}
+
+.menu-card p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.back-button {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+}
+
+/* --- Gaya Bagian Lain --- */
 .step-card, .log-card {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -50,7 +99,6 @@ header p {
     padding: 24px;
     margin-bottom: 24px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
 }
 
 .step-header {
@@ -70,6 +118,7 @@ header p {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 1rem;
 }
 
 .step-header h2 {
@@ -90,6 +139,7 @@ header p {
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
     font-weight: 500;
+    box-sizing: border-box;
 }
 
 .upload-button:hover {
@@ -129,7 +179,7 @@ video {
     color: var(--text-secondary);
 }
 
-input[type="number"] {
+input[type="number"], input[type="text"] {
     width: 100%;
     padding: 12px;
     background-color: var(--bg-color);
@@ -138,6 +188,20 @@ input[type="number"] {
     color: var(--text-color);
     font-size: 1rem;
     box-sizing: border-box;
+}
+
+textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 1rem;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 16px;
 }
 
 .action-button {
@@ -193,3 +257,56 @@ input[type="number"] {
     overflow-y: auto;
     border: 1px solid var(--border-color);
 }
+
+/* --- Gaya Pencarian Pexels --- */
+.separator-text {
+    text-align: center;
+    color: var(--text-secondary);
+    margin: 20px 0;
+    font-weight: 500;
+}
+
+.pexels-search-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+#btn-search-pexels {
+    padding: 0 20px;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+#btn-search-pexels:hover {
+    background-color: var(--primary-hover);
+}
+
+.video-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.video-result-item {
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+.video-result-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.video-result-item:hover {
+    border-color: var(--primary-color);
+    }
