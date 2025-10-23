@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Idea to Video - Magistory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💡 Idea to Video</h1>
+            <p>Ubah ide Anda menjadi video</p>
+        </header>
+
+        <a href="index.html" class="back-button">&larr; Kembali ke Menu</a>
+
+        <main id="idea-to-video-section">
+            <section class="step-card" id="idea-input-container">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h2>Tuliskan Ide Video Anda</h2>
+                </div>
+                <textarea id="idea-input" placeholder="Contoh: video sinematik tentang hujan di perkotaan saat malam hari"></textarea>
+                <button id="btn-generate-idea" class="action-button">
+                    <div class="loader" style="display: none;"></div>
+                    <span>Generate</span>
+                </button>
+            </section>
+            
+            <section class="step-card" id="timeline-editor" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h2>Edit Timeline Anda</h2>
+                </div>
+                <div id="timeline-container">
+                    </div>
+                <button id="btn-create-final-video" class="action-button" style="margin-top: 20px;">
+                    Buat Video Saya! (Fitur Selanjutnya)
+                </button>
+            </section>
+        </main>
+
+        <div id="replace-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h3>Ganti Video untuk Adegan <span id="modal-scene-number"></span></h3>
+                <label for="modal-video-uploader" class="upload-button">
+                    Pilih Dari Galeri
+                </label>
+                <input type="file" id="modal-video-uploader" accept="video/*" hidden>
+                
+                <p class="separator-text">atau</p>
+                
+                <div class="pexels-search-container">
+                    <input type="text" id="modal-pexels-search-input" placeholder="Cari video di Pexels...">
+                    <button id="modal-btn-search-pexels">Cari</axbutton>
+                </div>
+                <div id="modal-pexels-results" class="video-results-grid"></div>
+                <button id="modal-close-button" class="back-button" style="margin-top: 20px;">Tutup</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="idea.js"></script>
+</body>
+</html>
