@@ -76,6 +76,7 @@ header p {
     transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
+    text-align: center;
 }
 .back-button:hover {
     background-color: var(--surface-color);
@@ -159,7 +160,7 @@ video {
     font-weight: 500;
     color: var(--text-secondary);
 }
-input[type="number"], input[type="text"], textarea {
+input[type="number"], input[type="text"], textarea, select {
     width: 100%;
     padding: 12px;
     background-color: var(--bg-color);
@@ -270,7 +271,7 @@ textarea {
 .video-result-item:hover {
     border-color: var(--primary-color);
 }
-/* --- Gaya Timeline Baru --- */
+/* --- Gaya Timeline --- */
 #timeline-container {
     display: flex;
     flex-direction: column;
@@ -299,6 +300,7 @@ textarea {
     border-radius: 8px;
     margin-bottom: 10px;
     border: 1px solid var(--border-color);
+    background-color: #000;
 }
 .btn-replace-video {
     background-color: var(--surface-color);
@@ -309,7 +311,7 @@ textarea {
     border-radius: 5px;
     cursor: pointer;
 }
-/* --- Gaya Modal Baru --- */
+/* --- Gaya Modal (Umum) --- */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -332,4 +334,52 @@ textarea {
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
+}
+/* --- Gaya Modal Konfigurasi BARU --- */
+.config-group {
+    margin-bottom: 20px;
+}
+.config-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+.slider {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    background: var(--border-color);
+    outline: none;
+    border-radius: 5px;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    cursor: pointer;
+    border-radius: 50%;
+}
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    cursor: pointer;
+    border-radius: 50%;
+}
+.radio-group {
+    display: flex;
+    gap: 15px;
+}
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-color);
+}
+.radio-group.disabled, .radio-group.disabled .radio-option {
+    color: var(--border-color);
     }
