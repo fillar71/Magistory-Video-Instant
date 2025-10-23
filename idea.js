@@ -4,12 +4,20 @@ const BASE_BACKEND_URL = 'https://magistory-backend-production.up.railway.app';
 
 // --- Elemen Utama ---
 const ideaInput = document.getElementById('idea-input');
-const btnGenerateIdea = document.getElementById('btn-generate-idea');
+const btnGenerateIdea = document.getElementById('btn-generate-idea'); // Tombol utama
 const timelineEditor = document.getElementById('timeline-editor');
 const timelineContainer = document.getElementById('timeline-container');
 const ideaInputContainer = document.getElementById('idea-input-container');
 
-// --- Elemen Modal ---
+// --- Elemen Modal Konfigurasi (BARU) ---
+const configModal = document.getElementById('config-modal');
+const configDurationSlider = document.getElementById('config-duration');
+const durationLabel = document.getElementById('duration-label');
+const configStyleSelect = document.getElementById('config-style');
+const btnGenerateFromModal = document.getElementById('btn-generate-from-modal'); // Tombol di dalam modal
+const configModalCloseButton = document.getElementById('config-modal-close-button');
+
+// --- Elemen Modal Pengganti Video (Lama) ---
 const replaceModal = document.getElementById('replace-modal');
 const modalSceneNumber = document.getElementById('modal-scene-number');
 const modalVideoUploader = document.getElementById('modal-video-uploader');
@@ -18,7 +26,9 @@ const modalBtnSearchPexels = document.getElementById('modal-btn-search-pexels');
 const modalPexelsResults = document.getElementById('modal-pexels-results');
 const modalCloseButton = document.getElementById('modal-close-button');
 
+// --- Variabel Global ---
 let currentEditingSceneCard = null; // Menyimpan kartu adegan yang sedang diedit
+let currentAspectRatio = '16:9'; // Menyimpan aspect ratio pilihan pengguna
 
 // --- Fungsi untuk Membangun Timeline ---
 function buildTimeline(scenes) {
@@ -32,9 +42,10 @@ function buildTimeline(scenes) {
     scenes.forEach((scene, index) => {
         const sceneCard = document.createElement('div');
         sceneCard.className = 'scene-card';
-        sceneCard.dataset.sceneIndex = index; // Menyimpan index adegan
+        sceneCard.dataset.sceneIndex = index; 
 
-        const videoPreview = scene.video ? scene.video.image : 'https://via.placeholder.com/160x90.png?text=No+Video';
+        // Gunakan videoPreview dari backend, atau placeholder jika null
+        const videoPreview = scene.videoPreview || 'https://via.placeholder.com/160x90.png?text=No+Video';
         
         sceneCard.innerHTML = `
             <h4>Adegan ${scene.scene}</h4>
@@ -49,23 +60,54 @@ function buildTimeline(scenes) {
     ideaInputContainer.style.display = 'none'; // Sembunyikan input ide
 }
 
-// --- Event Listener Tombol Generate ---
-btnGenerateIdea.addEventListener('click', async () => {
-    const idea = ideaInput.value;
-    if (!idea) {
+// --- Event Listener Tombol Generate (UTAMA) ---
+// Tombol ini sekarang HANYA membuka modal
+btnGenerateIdea.addEventListener('click', () => {
+    if (!ideaInput.value) {
         alert('Harap masukkan ide video Anda.');
         return;
     }
+    configModal.style.display = 'flex'; // Tampilkan modal konfigurasi
+});
 
-    const loader = btnGenerateIdea.querySelector('.loader');
+// --- Event Listener Modal Konfigurasi ---
+
+// Update label durasi saat slider digerakkan
+configDurationSlider.addEventListener('input', (e) => {
+    durationLabel.textContent = `${e.target.value} menit`;
+});
+
+// Tombol Batal di modal konfigurasi
+configModalCloseButton.addEventListener('click', () => {
+    configModal.style.display = 'none';
+});
+
+// Tombol GENERATE di dalam modal (Logika Utama)
+btnGenerateFromModal.addEventListener('click', async () => {
+    const idea = ideaInput.value;
+    
+    // 1. Kumpulkan semua data dari modal
+    const duration = configDurationSlider.value;
+    const style = configStyleSelect.value;
+    // Dapatkan nilai aspect ratio yang dipilih
+    const aspectRatioRadio = document.querySelector('input[name="aspectRatio"]:checked');
+    currentAspectRatio = aspectRatioRadio ? aspectRatioRadio.value : '16:9'; // Simpan secara global
+
+    const loader = btnGenerateFromModal.querySelector('.loader');
     loader.style.display = 'block';
-    btnGenerateIdea.disabled = true;
+    btnGenerateFromModal.disabled = true;
 
     try {
+        // 2. Panggil backend dengan semua data
         const response = await fetch(`${BASE_BACKEND_URL}/idea-to-video`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idea: idea })
+            body: JSON.stringify({ 
+                idea: idea,
+                duration: duration,
+                aspectRatio: currentAspectRatio,
+                style: style
+            })
         });
 
         if (!response.ok) {
@@ -73,17 +115,19 @@ btnGenerateIdea.addEventListener('click', async () => {
         }
 
         const scenes = await response.json();
-        buildTimeline(scenes);
+        buildTimeline(scenes); // Bangun timeline
+        configModal.style.display = 'none'; // Sembunyikan modal
 
     } catch (error) {
         alert('Gagal memproses ide: ' + error.message);
     } finally {
         loader.style.display = 'none';
-        btnGenerateIdea.disabled = false;
+        btnGenerateFromModal.disabled = false;
     }
 });
 
-// --- Logika Modal Pengganti Video ---
+
+// --- Logika Modal Pengganti Video (Lama, sedikit modifikasi) ---
 
 // Membuka Modal
 timelineContainer.addEventListener('click', (e) => {
@@ -106,22 +150,15 @@ modalCloseButton.addEventListener('click', () => {
 // Fungsi untuk mengganti video di kartu adegan
 function replaceSceneVideo(newVideoUrl, newVideoFile = null) {
     if (!currentEditingSceneCard) return;
-
     const previewImage = currentEditingSceneCard.querySelector('.scene-video-preview');
-    
     if (newVideoFile) {
-        // Jika dari galeri, buat URL objek untuk pratinjau
         previewImage.src = URL.createObjectURL(newVideoFile);
-        // Di sini Anda akan menyimpan `newVideoFile` untuk di-upload/proses nanti
         console.log("File galeri dipilih:", newVideoFile.name);
     } else {
-        // Jika dari Pexels (hanya gambar pratinjau saat ini)
         previewImage.src = newVideoUrl;
-        // Di sini Anda akan menyimpan URL video Pexels untuk di-download/proses nanti
         console.log("Video Pexels dipilih:", newVideoUrl);
     }
-    
-    replaceModal.style.display = 'none'; // Tutup modal
+    replaceModal.style.display = 'none';
 }
 
 // Pengganti dari Galeri (Upload)
@@ -132,25 +169,25 @@ modalVideoUploader.addEventListener('change', (e) => {
     }
 });
 
-// Pengganti dari Pencarian Pexels
+// Pengganti dari Pencarian Pexels (MODIFIKASI)
 modalBtnSearchPexels.addEventListener('click', async () => {
     const query = modalPexelsInput.value;
     if (!query) return;
 
     modalPexelsResults.innerHTML = '<p>Mencari...</p>';
     try {
-        const response = await fetch(`${BASE_BACKEND_URL}/search-pexels?query=${encodeURIComponent(query)}`);
+        // Kirim query DAN aspect ratio saat ini
+        const response = await fetch(`${BASE_BACKEND_URL}/search-pexels?query=${encodeURIComponent(query)}&orientation=${currentAspectRatio}`);
         if (!response.ok) throw new Error(await response.text());
         
         const videos = await response.json();
-        modalPexelsResults.innerHTML = ''; // Kosongkan
+        modalPexelsResults.innerHTML = '';
         
         videos.forEach(video => {
             const item = document.createElement('div');
             item.className = 'video-result-item';
             item.innerHTML = `<img src="${video.image}" alt="${video.user.name}">`;
             item.addEventListener('click', () => {
-                // Saat ini kita ganti dengan gambar pratinjau Pexels
                 replaceSceneVideo(video.image);
             });
             modalPexelsResults.appendChild(item);
