@@ -26,7 +26,6 @@
                 </div>
                 <textarea id="idea-input" placeholder="Contoh: video sinematik tentang hujan di perkotaan saat malam hari"></textarea>
                 <button id="btn-generate-idea" class="action-button">
-                    <div class="loader" style="display: none;"></div>
                     <span>Generate</span>
                 </button>
             </section>
@@ -38,11 +37,62 @@
                 </div>
                 <div id="timeline-container">
                     </div>
-                <button id="btn-create-final-video" class="action-button" style="margin-top: 20px;">
-                    Buat Video Saya! (Fitur Selanjutnya)
+                <button id="btn-continue-editing" class="action-button" style="margin-top: 20px;">
+                    Lanjutkan Mengedit
                 </button>
             </section>
         </main>
+
+        <div id="config-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h3>Atur Video Anda</h3>
+                
+                <div class="config-group">
+                    <label for="config-duration">Durasi Video: <span id="duration-label">1 menit</span></label>
+                    <input type="range" id="config-duration" min="1" max="60" value="1" class="slider">
+                </div>
+                
+                <div class="config-group">
+                    <label>Ukuran Layar (Aspect Ratio)</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="aspectRatio" value="16:9" checked> 16:9 (Landscape)
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="aspectRatio" value="9:16"> 9:16 (Portrait)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="config-group">
+                    <label for="config-style">Style Video</label>
+                    <select id="config-style">
+                        <option value="Iklan">Iklan</option>
+                        <option value="Presentasi">Presentasi</option>
+                        <option value="Edukasi">Edukasi</option>
+                        <option value="Tutorial">Tutorial</option>
+                    </select>
+                </div>
+                
+                <div class="config-group">
+                    <label>Pilihan Suara (Segera Tersedia)</label>
+                    <div class="radio-group disabled">
+                        <label class="radio-option">
+                            <input type="radio" name="voice" value="male" disabled> Laki-laki
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="voice" value="female" disabled> Perempuan
+                        </label>
+                    </div>
+                </div>
+
+                <button id="btn-generate-from-modal" class="action-button" style="margin-top: 20px;">
+                    <div class="loader" style="display: none;"></div>
+                    <span>Generate Video</span>
+                </button>
+                <button id="config-modal-close-button" class="back-button" style="margin-top: 10px; width: 100%; box-sizing: border-box;">Batal</button>
+            </div>
+        </div>
 
         <div id="replace-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
@@ -56,7 +106,7 @@
                 
                 <div class="pexels-search-container">
                     <input type="text" id="modal-pexels-search-input" placeholder="Cari video di Pexels...">
-                    <button id="modal-btn-search-pexels">Cari</axbutton>
+                    <button id="modal-btn-search-pexels">Cari</button>
                 </div>
                 <div id="modal-pexels-results" class="video-results-grid"></div>
                 <button id="modal-close-button" class="back-button" style="margin-top: 20px;">Tutup</button>
