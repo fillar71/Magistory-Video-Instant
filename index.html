@@ -13,22 +13,63 @@
 
     <div class="container">
         <header>
-            <h1>Magistory ✨</h1>
-            <p>Video editing jadi lebih mudah.</p>
+            <h1 id="app-title">Magistory ✨</h1>
+            <p id="app-subtitle">Pilih mode untuk memulai</p>
         </header>
 
-        <main>
+        <main id="main-menu">
+            <div class="menu-card" id="btn-show-idea">
+                <h2>💡 Idea to Video</h2>
+                <p>Ubah ide Anda menjadi video dengan AI</p>
+            </div>
+            <div class="menu-card" id="btn-show-manual">
+                <h2>✂️ Manual Editing</h2>
+                <p>Edit video dari galeri atau stok Pexels</p>
+            </div>
+        </main>
+
+        <button id="btn-back-to-menu" class="back-button" style="display: none;">&larr; Kembali ke Menu</button>
+
+        <main id="idea-to-video-section" style="display: none;">
+            <section class="step-card">
+                <div class="step-header">
+                    <div class="step-number">💡</div>
+                    <h2>Tuliskan Ide Video Anda</h2>
+                </div>
+                <textarea id="idea-input" placeholder="Contoh: video sinematik tentang hujan di perkotaan saat malam hari"></textarea>
+                <button id="btn-generate-idea" class="action-button">
+                    <div class="loader" style="display: none;"></div>
+                    <span>Generate</span>
+                </button>
+            </section>
+            <section class="step-card" id="idea-results-container" style="display: none;">
+                <h3>Video yang Ditemukan (Pilih satu):</h3>
+                <div id="idea-results" class="video-results-grid">
+                    </div>
+            </section>
+        </main>
+
+        <main id="manual-editing-section" style="display: none;">
             <section class="step-card" id="upload-step">
                 <div class="step-header">
                     <div class="step-number">1</div>
-                    <h2>Unggah Video Anda</h2>
+                    <h2>Pilih Sumber Video</h2>
                 </div>
+                
                 <label for="video-uploader" class="upload-button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                    <span>Pilih File Video</span>
+                    <span>Pilih Dari Galeri</span>
                 </label>
                 <input type="file" id="video-uploader" accept="video/*" hidden>
-                <p id="file-name-display" class="file-name"></p>
+                
+                <p class="separator-text">atau</p>
+                
+                <div class="pexels-search-container">
+                    <input type="text" id="pexels-search-input" placeholder="Cari video di Pexels...">
+                    <button id="btn-search-pexels">Cari</button>
+                </div>
+                <div id="pexels-results" class="video-results-grid">
+                    </div>
             </section>
 
             <section class="step-card" id="edit-step" style="display: none;">
@@ -36,6 +77,7 @@
                     <div class="step-number">2</div>
                     <h2>Pratinjau & Atur Pemotongan</h2>
                 </div>
+                <p id="file-name-display" class="file-name"></p>
                 <div class="video-container">
                     <video id="video-player-original" controls></video>
                 </div>
@@ -55,7 +97,7 @@
                     <span>Potong Video Sekarang</span>
                 </button>
             </section>
-
+            
             <section class="log-card" id="log-section" style="display: none;">
                 <h3>Log Proses</h3>
                 <pre id="log-output"></pre>
